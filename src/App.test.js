@@ -1,18 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { extractContent } from './api'
+import { shallow, render, mount, configure } from 'enzyme';
+import {extractContent, getDollarAmount} from './api'
 import { getCryptoCoinName } from './api'
-import { getCryptoCoinMarketCap } from './api'
-import { getCryptoCoinPrice } from './api'
-import { getCryptoCoinVolume } from './api'
 import { getCryptoCoinCirculatingSupply } from './api'
 import { getCryptoCoinChange } from './api'
 import { getCryptoCoinPriceGraphImg } from './api'
 
-
-let bitcoin = '<tr id="id-bitcoin" class=""><td class="text-center">1</td><td class="no-wrap currency-name" data-sort="Bitcoin"><img src="https://s2.coinmarketcap.com/static/img/coins/32x32/1.png" class="logo-sprite" alt="Bitcoin" height="16" width="16"/><span class="currency-symbol visible-xs"><a class="link-secondary" href="/currencies/bitcoin/">BTC</a></span><br class="visible-xs"/><a class="currency-name-container link-secondary" href="/currencies/bitcoin/">Bitcoin</a></td><td class="no-wrap market-cap text-right" data-usd="1.42668853611e+11" data-btc="17722387.0" data-sort="1.42668853611e+11">$142,668,853,611</td><td class="no-wrap text-right" data-sort="8050.20529184"><a href="/currencies/bitcoin/#markets" class="price" data-usd="8050.20529184" data-btc="1.0">$8050.21</a></td><td class="no-wrap text-right" data-sort="21954122025.7"><a href="/currencies/bitcoin/#markets" class="volume" data-usd="21954122025.7" data-btc="2731352.52028">$21,954,122,026</a></td><td class="no-wrap text-right circulating-supply" data-sort="17722387.0"><span data-supply="17722387.0"><span data-supply-container="data-supply-container">17,722,387</span><span class="hidden-xs">BTC</span></span></td><td class="no-wrap percent-change  positive_change  text-right" data-timespan="24h" data-percentusd="0.284176" data-symbol="BTC" data-sort="0.284176">0.28%</td><td><a href="/currencies/bitcoin/#charts"><img class="sparkline" alt="sparkline" src="https://s2.coinmarketcap.com/generated/sparklines/web/7d/usd/1.png"/></a></td><td class="dropdown" data-more-options="data-more-options" data-cc-id="1" data-cc-slug="bitcoin"><button class="btn btn-transparent dropdown-toggle" type="button" id="dropdown-menu-1" data-toggle="dropdown"><span class="glyphicons glyphicons-more text-gray"></span></button><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdown-menu-1"><li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-watchlist-add="data-watchlist-add">Add to Watchlist</a></li><li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-watchlist-remove="data-watchlist-remove">Remove from Watchlist</a></li><li class="disabled" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-watchlist-full="data-watchlist-full">Watchlist full!</a></li><li role="presentation"><a role="menuitem" tabindex="-1" href="/currencies/bitcoin/#charts">View Chart</a></li><li role="presentation"><a role="menuitem" tabindex="-1" href="/currencies/bitcoin/#markets">View Markets</a></li><li role="presentation"><a role="menuitem" tabindex="-1" href="/currencies/bitcoin/historical-data/">View Historical Data</a></li></ul></td></tr>';
-const regExpression = /\d/g;
+let bitcoin = 'style="display:table-row"><td class="cmc-table__cell cmc-table__cell--sticky cmc-table__cell--sortable cmc-table__cell--left cmc-table__cell--sort-by__rank"><div class="">1</div></td><td class="cmc-table__cell cmc-table__cell--sticky cmc-table__cell--sortable cmc-table__cell--left cmc-table__cell--sort-by__name"><div class="cmc-table__column-name sc-1kxikfi-0 eTVhdN"><img src="https://s2.coinmarketcap.com/static/img/coins/32x32/1.png" alt="Bitcoin" width="16" height="16" class="cmc-static-icon cmc-static-icon-1"/><a href="/currencies/bitcoin/" title="Bitcoin" class="cmc-link">Bitcoin</a></div></td><td class="cmc-table__cell cmc-table__cell--sortable cmc-table__cell--right cmc-table__cell--sort-by__market-cap"><div class="">$130,775,230,453</div></td><td class="cmc-table__cell cmc-table__cell--sortable cmc-table__cell--right cmc-table__cell--sort-by__price"><a href="/currencies/bitcoin/markets/" class="cmc-link">$7,130.65</a></td><td class="cmc-table__cell cmc-table__cell--sortable cmc-table__cell--right cmc-table__cell--sort-by__volume-24-h"><a href="/currencies/bitcoin/markets/" class="cmc-link">$32,819,544,349</a></td><td class="cmc-table__cell cmc-table__cell--sortable cmc-table__cell--right cmc-table__cell--sort-by__circulating-supply"><div class="">18,339,887 BTC</div></td><td class="cmc-table__cell cmc-table__cell--sortable cmc-table__cell--right cmc-table__cell--sort-by__percent-change-24-h"><div class="cmc--change-positive">3.43%</div></td><td class="cmc-table__cell cmc-table__cell--right"><div class="cmc-table__column-graph sc-19x49g1-0 fQbfms"><a href="/currencies/bitcoin/" class="cmc-link"><img src="https://s2.coinmarketcap.com/generated/sparklines/web/7d/usd/1.png" alt="sparkline" width="164" height="48" class="cmc-price-graph"/></a></div></td><td class="cmc-table__cell cmc-table__cell--right"><div class="kdqqbs-0 gJUyCH"><div class="cmc-popover sc-12d77vg-0 ERwrC"><div class="cmc-popover__trigger"><span class="cmc-icon__wrap Icon__StyledIcon-sc-1pqyw27-0 nvudS"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h fa-w-16 cmc-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path></svg></span></div></div></div></td></tr>';
+const regExpressionDollar = /\d/g;
+const regExpressionCheckPercent = /^\d+(\.\d+)?%$/;
 const regExpressionImgGraphStartsWith = new RegExp("^(http|https)://", "i");
 const regExpressionImgGraphEndsWith = /.png$/;
 
@@ -46,13 +44,13 @@ describe('Test parsing the market cap value', () => {
     let bitCoinMarketCapObj = '';
 
     it('Test getestVartCryptoCoinMarketCap', () => {
-        bitCoinMarketCapObj = getCryptoCoinMarketCap(bitcoin);
+        bitCoinMarketCapObj = getDollarAmount(bitcoin,'market-cap');
         expect(bitCoinMarketCapObj).toBeDefined();
     });
 
     it('Test extractContent with market cap.', () => {
         const bitCoinMarketCap = extractContent(bitCoinMarketCapObj);
-        expect(bitCoinMarketCap).toMatch(regExpression);
+        expect(bitCoinMarketCap).toMatch(regExpressionDollar);
     });
 });
 
@@ -60,13 +58,13 @@ describe('Test parsing the price', () => {
    let bitCoinPriceObj = '';
 
    it('Test getCryptoCoinPrice', () => {
-       bitCoinPriceObj = getCryptoCoinPrice(bitcoin);
+       bitCoinPriceObj = getDollarAmount(bitcoin,'price');
        expect(bitCoinPriceObj).toBeDefined();
    });
 
    it('Test extractContent with price', () => {
       const bitCoinPrice = extractContent(bitCoinPriceObj);
-      expect(bitCoinPrice).toMatch(regExpression);
+      expect(bitCoinPrice).toMatch(regExpressionDollar);
    });
 });
 
@@ -74,13 +72,13 @@ describe('Test parsing the Volume', () => {
     let bitCoinVolumeObj = '';
 
     it('Test getCryptoCoinVolume', () => {
-        bitCoinVolumeObj = getCryptoCoinVolume(bitcoin);
+        bitCoinVolumeObj = getDollarAmount(bitcoin,'volume');
         expect(bitCoinVolumeObj).toBeDefined();
     });
 
     it('Test extractContent with volume', () => {
        const bitCoinVolume = extractContent(bitCoinVolumeObj);
-       expect(bitCoinVolume).toMatch(regExpression);
+       expect(bitCoinVolume).toMatch(regExpressionDollar);
     });
 });
 
@@ -94,7 +92,7 @@ describe('Test parsing the circulating supply', () => {
 
     it('Text extractContent with circulating supply', () => {
        const bitCoinCirculatingSupply = extractContent(bitCoinCirculatingSupplyObj);
-       expect(bitCoinCirculatingSupply).toMatch(regExpression);
+       expect(bitCoinCirculatingSupply).toMatch(regExpressionDollar);
     });
 });
 
@@ -108,7 +106,8 @@ describe('Test parsing the price change', () => {
 
    it('Test extractContent with price change', () => {
       const bitCoinPriceChange = extractContent(bitCoinPriceChangeObj);
-      expect(bitCoinPriceChange).toMatch(regExpression);
+      console.log('HERE:    ' + bitCoinPriceChange);
+      expect(bitCoinPriceChange).toMatch(regExpressionCheckPercent);
    });
 });
 

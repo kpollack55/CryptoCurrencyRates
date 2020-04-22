@@ -69,24 +69,6 @@ export function getCryptoCoinName(cryptoCoin){
     }
 }
 
-export function getCryptoCoinPrice(cryptoCoin) {
-    const parser = new DOMParser.DOMParser();
-    const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const priceElement = parsedElement.getElementsByAttribute('class','price');
-    const priceValue = parser.parseFromString(priceElement.toString(), 'text/html');
-
-    return priceValue;
-}
-
-export function getCryptoCoinVolume(cryptoCoin) {
-    const parser = new DOMParser.DOMParser();
-    const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const volumeElement = parsedElement.getElementsByAttribute('class', 'volume');
-    const volumeValue = parser.parseFromString(volumeElement.toString(), 'text/html');
-
-    return volumeValue;
-}
-
 export function getCryptoCoinChange(cryptoCoin) {
     const parser = new DOMParser.DOMParser();
     const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
