@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import './App.css';
 import CryptoCoin from './CryptoCoin.js';
 import DOMParser from 'react-native-html-parser'
+
 import { extractContent } from './api'
 import { getCryptoCoinName } from './api'
-import { getCryptoCoinMarketCap } from './api'
-import { getCryptoCoinPrice } from './api'
-import { getCryptoCoinVolume } from './api'
+import { getCryptoCoinRows } from './api'
+import { getDollarAmount } from './api'
 import { getCryptoCoinCirculatingSupply } from './api'
 import { getCryptoCoinChange } from './api'
 import { getCryptoCoinPriceGraphImg } from './api'
+
 import bitCoinGraph from './crypto_graph_images/Bitcoin.png';
 import etheumGraph from './crypto_graph_images/Ethereum.png';
 import xrpGraph from './crypto_graph_images/XRP.png';
@@ -21,8 +22,6 @@ import tetherGraph from './crypto_graph_images/Tether.png';
 import cardanoGraph from './crypto_graph_images/Cardano.png';
 import tronGraph from './crypto_graph_images/TRON.png';
 
-
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -30,6 +29,7 @@ class App extends Component {
     this.state = {
       seconds: 0,
       intialCompDidMount: false,
+      cryptoCoins: [],
 
       // Initialize state so user does not see blank data upon load.
       bitCoinName: 'Bitcoin',
@@ -112,444 +112,218 @@ class App extends Component {
       tronChange: '0.54%',
       tronImgGraph: tronGraph
     };
-  } // end constructor
+  }
 
   getCryptoData() {
     fetch('http://localhost:3001/')
         .then((resp) => { return resp.text() })
         .then((data) => {
-          this.getCryptoCoinData(data);
+          this.main(data);
         })
         .catch((error) => {
           console.error(error);
         });
-  } // end getCryptoData
+  }
 
-  getCryptoCoinData(data){
+  main(data){
+    // Get the crypto currency data
     const parser = new DOMParser.DOMParser();
     const parsed = parser.parseFromString(data, 'text/html');
+    let arrays = getCryptoCoinRows(parsed);
 
-    const bitcoin = parsed.getElementsByAttribute('id', 'id-bitcoin');
-    let bitCoinName = getCryptoCoinName(bitcoin);
-    bitCoinName = extractContent(bitCoinName);
-    let bitCoinMarketCap = getCryptoCoinMarketCap(bitcoin);
-    bitCoinMarketCap = extractContent(bitCoinMarketCap);
-    let bitCoinPrice = getCryptoCoinPrice(bitcoin);
-    bitCoinPrice = extractContent(bitCoinPrice);
-    let bitCoinVolume = getCryptoCoinVolume(bitcoin);
-    bitCoinVolume = extractContent(bitCoinVolume);
-    let bitCoinCirculatingSupply = getCryptoCoinCirculatingSupply(bitcoin);
-    bitCoinCirculatingSupply = extractContent(bitCoinCirculatingSupply);
-    let bitCoinChange = getCryptoCoinChange(bitcoin);
-    bitCoinChange = extractContent(bitCoinChange);
-    let bitCoinImgGraph = getCryptoCoinPriceGraphImg(bitcoin);
-    bitCoinImgGraph = extractContent(bitCoinImgGraph);
+    // Populate crypto coin object with data retrieved
+    this.setCryptoCoins(arrays);
 
-    this.setState({
-      bitCoinMarketCap: bitCoinMarketCap,
-      bitCoinName: bitCoinName,
-      bitCoinPrice: bitCoinPrice,
-      bitCoinVolume: bitCoinVolume,
-      bitCoinCirculatingSupply: bitCoinCirculatingSupply,
-      bitCoinChange: bitCoinChange,
-      bitCoinImgGraph: bitCoinImgGraph
-    });
-
-    const ethereum = parsed.getElementsByAttribute('id', 'id-ethereum');
-    let ethereumName = getCryptoCoinName(ethereum);
-    ethereumName = extractContent(ethereumName);
-    let ethereumMarketCap = getCryptoCoinMarketCap(ethereum);
-    ethereumMarketCap = extractContent(ethereumMarketCap);
-    let ethereumPrice = getCryptoCoinPrice(ethereum);
-    ethereumPrice = extractContent(ethereumPrice);
-    let ethereumVolume = getCryptoCoinVolume(ethereum);
-    ethereumVolume = extractContent(ethereumVolume);
-    let ethereumCirculatingSupply = getCryptoCoinCirculatingSupply(ethereum);
-    ethereumCirculatingSupply = extractContent(ethereumCirculatingSupply);
-    let ethereumChange = getCryptoCoinChange(ethereum);
-    ethereumChange = extractContent(ethereumChange);
-    let ethereumImgGraph = getCryptoCoinPriceGraphImg(ethereum);
-    ethereumImgGraph = extractContent(ethereumImgGraph);
-
-    this.setState({
-      ethereumName: ethereumName,
-      ethereumMarketCap: ethereumMarketCap,
-      ethereumPrice: ethereumPrice,
-      ethereumVolume: ethereumVolume,
-      ethereumCirculatingSupply: ethereumCirculatingSupply,
-      ethereumChange: ethereumChange,
-      ethereumImgGraph: ethereumImgGraph
-    });
-
-    const xrp = parsed.getElementsByAttribute('id', 'id-ripple');
-    let xrpName = getCryptoCoinName(xrp);
-    xrpName = extractContent(xrpName);
-    let xrpMarketCap = getCryptoCoinMarketCap(xrp);
-    xrpMarketCap = extractContent(xrpMarketCap);
-    let xrpPrice = getCryptoCoinPrice(xrp);
-    xrpPrice = extractContent(xrpPrice);
-    let xrpVolume = getCryptoCoinVolume(xrp);
-    xrpVolume = extractContent(xrpVolume);
-    let xrpCirculatingSupply = getCryptoCoinCirculatingSupply(xrp);
-    xrpCirculatingSupply = extractContent(xrpCirculatingSupply);
-    let xrpChange = getCryptoCoinChange(xrp);
-    xrpChange = extractContent(xrpChange);
-    let xrpImgGraph = getCryptoCoinPriceGraphImg(xrp);
-    xrpImgGraph = extractContent(xrpImgGraph);
-
-    this.setState({
-      xrpName: xrpName,
-      xrpMarketCap: xrpMarketCap,
-      xrpPrice: xrpPrice,
-      xrpVolume: xrpVolume,
-      xrpCirculatingSupply: xrpCirculatingSupply,
-      xrpChange: xrpChange,
-      xrpImgGraph: xrpImgGraph
-    });
-
-    const eos = parsed.getElementsByAttribute('id', 'id-eos');
-    let eosName = getCryptoCoinName(eos);
-    eosName = extractContent(eosName);
-    let eosMarketCap = getCryptoCoinMarketCap(eos);
-    eosMarketCap = extractContent(eosMarketCap);
-    let eosPrice = getCryptoCoinPrice(eos);
-    eosPrice = extractContent(eosPrice);
-    let eosVolume = getCryptoCoinVolume(eos);
-    eosVolume = extractContent(eosVolume);
-    let eosCirculatingSupply = getCryptoCoinCirculatingSupply(eos);
-    eosCirculatingSupply = extractContent(eosCirculatingSupply);
-    let eosChange = getCryptoCoinChange(eos);
-    eosChange = extractContent(eosChange);
-    let eosImgGraph = getCryptoCoinPriceGraphImg(eos);
-    eosImgGraph = extractContent(eosImgGraph);
-
-    this.setState({
-      eosName: eosName,
-      eosMarketCap: eosMarketCap,
-      eosPrice: eosPrice,
-      eosVolume: eosVolume,
-      eosCirculatingSupply: eosCirculatingSupply,
-      eosChange: eosChange,
-      eosImgGraph: eosImgGraph
-    });
-
-    const stellar = parsed.getElementsByAttribute('id', 'id-stellar');
-    let stellarName = getCryptoCoinName(stellar);
-    stellarName = extractContent(stellarName);
-    let stellarMarketCap = getCryptoCoinMarketCap(stellar);
-    stellarMarketCap = extractContent(stellarMarketCap);
-    let stellarPrice = getCryptoCoinPrice(stellar);
-    stellarPrice = extractContent(stellarPrice);
-    let stellarVolume = getCryptoCoinVolume(stellar);
-    stellarVolume = extractContent(stellarVolume);
-    let stellarCirculatingSupply = getCryptoCoinCirculatingSupply(stellar);
-    stellarCirculatingSupply = extractContent(stellarCirculatingSupply);
-    let stellarChange = getCryptoCoinChange(stellar);
-    stellarChange = extractContent(stellarChange);
-    let stellarImgGraph = getCryptoCoinPriceGraphImg(stellar);
-    stellarImgGraph = extractContent(stellarImgGraph);
-
-    this.setState({
-      stellarName: stellarName,
-      stellarMarketCap: stellarMarketCap,
-      stellarPrice: stellarPrice,
-      stellarVolume: stellarVolume,
-      stellarCirculatingSupply: stellarCirculatingSupply,
-      stellarChange: stellarChange,
-      stellarImgGraph: stellarImgGraph
-    });
-
-    const liteCoin = parsed.getElementsByAttribute('id', 'id-litecoin');
-    let liteCoinName = getCryptoCoinName(liteCoin);
-    liteCoinName = extractContent(liteCoinName);
-    let liteCoinMarketCap = getCryptoCoinMarketCap(liteCoin);
-    liteCoinMarketCap = extractContent(liteCoinMarketCap);
-    let liteCoinPrice = getCryptoCoinPrice(liteCoin);
-    liteCoinPrice = extractContent(liteCoinPrice);
-    let liteCoinVolume = getCryptoCoinVolume(liteCoin);
-    liteCoinVolume = extractContent(liteCoinVolume);
-    let liteCoinCirculatingSupply = getCryptoCoinCirculatingSupply(liteCoin);
-    liteCoinCirculatingSupply = extractContent(liteCoinCirculatingSupply);
-    let liteCoinChange = getCryptoCoinChange(liteCoin);
-    liteCoinChange = extractContent(liteCoinChange);
-    let liteCoinImgGraph = getCryptoCoinPriceGraphImg(liteCoin);
-    liteCoinImgGraph = extractContent(liteCoinImgGraph);
-
-    this.setState({
-      liteCoinName: liteCoinName,
-      liteCoinMarketCap: liteCoinMarketCap,
-      liteCoinPrice: liteCoinPrice,
-      liteCoinVolume: liteCoinVolume,
-      liteCoinCirculatingSupply: liteCoinCirculatingSupply,
-      liteCoinChange: liteCoinChange,
-      liteCoinImgGraph: liteCoinImgGraph
-    });
-
-    const bitCoinSV = parsed.getElementsByAttribute('id', 'id-bitcoin-sv');
-    let bitCoinSVName = getCryptoCoinName(bitCoinSV);
-    bitCoinSVName = extractContent(bitCoinSVName);
-    let bitCoinSVMarketCap = getCryptoCoinMarketCap(bitCoinSV);
-    bitCoinSVMarketCap = extractContent(bitCoinSVMarketCap);
-    let bitCoinSVPrice = getCryptoCoinPrice(bitCoinSV);
-    bitCoinSVPrice = extractContent(bitCoinSVPrice);
-    let bitCoinSVVolume = getCryptoCoinVolume(bitCoinSV);
-    bitCoinSVVolume = extractContent(bitCoinSVVolume);
-    let bitCoinSVCirculatingSupply = getCryptoCoinCirculatingSupply(bitCoinSV);
-    bitCoinSVCirculatingSupply = extractContent(bitCoinSVCirculatingSupply);
-    let bitCoinSVChange = getCryptoCoinChange(bitCoinSV);
-    bitCoinSVChange = extractContent(bitCoinSVChange);
-    let bitCoinSVImgGraph = getCryptoCoinPriceGraphImg(bitCoinSV);
-    bitCoinSVImgGraph = extractContent(bitCoinSVImgGraph);
-
-    this.setState({
-      bitCoinSVName: bitCoinSVName,
-      bitCoinSVMarketCap: bitCoinSVMarketCap,
-      bitCoinSVPrice: bitCoinSVPrice,
-      bitCoinSVVolume: bitCoinSVVolume,
-      bitCoinSVCirculatingSupply: bitCoinSVCirculatingSupply,
-      bitCoinSVChange: bitCoinSVChange,
-      bitCoinSVImgGraph: bitCoinSVImgGraph
-    });
-
-    const tether = parsed.getElementsByAttribute('id', 'id-tether');
-    let tetherName = getCryptoCoinName(tether);
-    tetherName = extractContent(tetherName);
-    let tetherMarketCap = getCryptoCoinMarketCap(tether);
-    tetherMarketCap = extractContent(tetherMarketCap);
-    let tetherPrice = getCryptoCoinPrice(tether);
-    tetherPrice = extractContent(tetherPrice);
-    let tetherVolume = getCryptoCoinVolume(tether);
-    tetherVolume = extractContent(tetherVolume);
-    let tetherCirculatingSupply = getCryptoCoinCirculatingSupply(tether);
-    tetherCirculatingSupply = extractContent(tetherCirculatingSupply);
-    let tetherChange = getCryptoCoinChange(tether);
-    tetherChange = extractContent(tetherChange);
-    let tetherImgGraph = getCryptoCoinPriceGraphImg(tether);
-    tetherImgGraph = extractContent(tetherImgGraph);
-
-    this.setState({
-      tetherName: tetherName,
-      tetherMarketCap: tetherMarketCap,
-      tetherPrice: tetherPrice,
-      tetherVolume: tetherVolume,
-      tetherCirculatingSupply: tetherCirculatingSupply,
-      tetherChange: tetherChange,
-      tetherImgGraph: tetherImgGraph
-    });
-
-    const cardano = parsed.getElementsByAttribute('id', 'id-cardano');
-    let cardanoName = getCryptoCoinName(cardano);
-    cardanoName = extractContent(cardanoName);
-    let cardanoMarketCap = getCryptoCoinMarketCap(cardano);
-    cardanoMarketCap = extractContent(cardanoMarketCap);
-    let cardanoPrice = getCryptoCoinPrice(cardano);
-    cardanoPrice = extractContent(cardanoPrice);
-    let cardanoVolume = getCryptoCoinVolume(cardano);
-    cardanoVolume = extractContent(cardanoVolume);
-    let cardanoCirculatingSupply = getCryptoCoinCirculatingSupply(cardano);
-    cardanoCirculatingSupply = extractContent(cardanoCirculatingSupply);
-    let cardanoChange = getCryptoCoinChange(cardano);
-    cardanoChange = extractContent(cardanoChange);
-    let cardanoImgGraph = getCryptoCoinPriceGraphImg(cardano);
-    cardanoImgGraph= extractContent(cardanoImgGraph);
-
-    this.setState({
-      cardanoName: cardanoName,
-      cardanoMarketCap: cardanoMarketCap,
-      cardanoPrice: cardanoPrice,
-      cardanoVolume: cardanoVolume,
-      cardanoCirculatingSupply: cardanoCirculatingSupply,
-      cardanoChange: cardanoChange,
-      cardanoImgGraph: cardanoImgGraph
-    });
-
-    const tron = parsed.getElementsByAttribute('id', 'id-tron');
-    let tronName = getCryptoCoinName(tron);
-    tronName = extractContent(tronName);
-    let tronMarketCap = getCryptoCoinMarketCap(tron);
-    tronMarketCap = extractContent(tronMarketCap);
-    let tronPrice = getCryptoCoinPrice(tron);
-    tronPrice = extractContent(tronPrice);
-    let tronVolume = getCryptoCoinVolume(tron);
-    tronVolume = extractContent(tronVolume);
-    let tronCirculatingSupply = getCryptoCoinCirculatingSupply(tron);
-    tronCirculatingSupply = extractContent(tronCirculatingSupply);
-    let tronChange = getCryptoCoinChange(tron);
-    tronChange = extractContent(tronChange);
-    let tronImgGraph = getCryptoCoinPriceGraphImg(tron);
-    tronImgGraph = extractContent(tronImgGraph);
-
-    this.setState({
-      tronName: tronName,
-      tronMarketCap: tronMarketCap,
-      tronPrice: tronPrice,
-      tronVolume: tronVolume,
-      tronCirculatingSupply: tronCirculatingSupply,
-      tronChange: tronChange,
-      tronImgGraph: tronImgGraph
-    });
-
+    // Set the timer state
     this.setState(prevState => ({
       seconds: prevState.seconds + 1
     }));
-  } // end getCryptoCoinData
+  }
 
-  setCryptoCoin(cryptoCoin) {
-    let cryptoCoinName = getCryptoCoinName(cryptoCoin);
-    cryptoCoinName = extractContent(cryptoCoinName);
-    let cryptoCoinMarketCap = getCryptoCoinMarketCap(cryptoCoin);
-    cryptoCoinMarketCap = extractContent(cryptoCoinMarketCap);
-    let cryptoCoinPrice = getCryptoCoinPrice(cryptoCoin);
-    cryptoCoinPrice = extractContent(cryptoCoinPrice);
-    let cryptoCoinVolume = getCryptoCoinVolume(cryptoCoin);
-    cryptoCoinVolume = extractContent(cryptoCoinVolume);
-    let cryptoCoinCirculatingSupply = getCryptoCoinCirculatingSupply(cryptoCoin);
-    cryptoCoinCirculatingSupply = extractContent(cryptoCoinCirculatingSupply);
-    let cryptoCoinChange = getCryptoCoinChange(cryptoCoin);
-    cryptoCoinChange = extractContent(cryptoCoinChange);
-    let cryptoCoinImgGraph = getCryptoCoinPriceGraphImg(cryptoCoin);
-    cryptoCoinImgGraph = extractContent(cryptoCoinImgGraph);
+  setCryptoCoins(cryptoCoins) {
+      for(var i=1; i<=10; i++) {
+          let cryptoCoin = {};
 
-    this.setState({
-      cryptoCoinName: cryptoCoinName,
-      cryptoCoinMarketCap: cryptoCoinMarketCap,
-      cryptoCoinPrice: cryptoCoinPrice,
-      cryptoCoinVolume: cryptoCoinVolume,
-      cryptoCoinCirculatingSupply: cryptoCoinCirculatingSupply,
-      cryptoCoinChange: cryptoCoinChange,
-      cryptoCoinImgGraph: cryptoCoinImgGraph
-    });
-  } // end setCryptoCoin
+          cryptoCoin.coinName = getCryptoCoinName(cryptoCoins[i]);
+          cryptoCoin.marketCap = getDollarAmount(cryptoCoins[i],'market-cap');
+          cryptoCoin.price = getDollarAmount(cryptoCoins[i],'price');
+          cryptoCoin.volume = getDollarAmount(cryptoCoins[i],'volume');
+          cryptoCoin.circulatingSupply = extractContent(getCryptoCoinCirculatingSupply(cryptoCoins[i]));
+          cryptoCoin.change = getCryptoCoinChange(cryptoCoins[i]);
+          cryptoCoin.priceGraph = getCryptoCoinPriceGraphImg(cryptoCoins[i]);
+
+          this.state.cryptoCoins.push(cryptoCoin);
+      }
+  }
 
   componentDidMount() {
-    if ( this.state.intialCompDidMount ==  false) {
+    if ( this.state.intialCompDidMount ===  false) {
       this.state.intialCompDidMount = true;
+      // Set interval at 10 for first iteration so place holder data is replaced right away from page load
       this.interval = setInterval(() => this.getCryptoData(), 10);
     } else {
       this.interval = setInterval(() => this.getCryptoData(), 10000);
     }
-  } // end componentDidMount
+  }
+
+  componentDidUpdate() {
+    this.state.cryptoCoins = [];
+  }
 
   componentWillUnmount() {
     clearInterval(this.interval);
-  } // end componentWillUnmount
+  }
 
   render() {
-    return (
-      <div className="App">
-        <h1 className="crypto-currency-title">Crypto Currencies Market Capitalization</h1>
-          <div className="crypto-coin-header-row">
-            <div className="crypto-coin-header col-md-1">Name</div>
-            <div className="crypto-coin-header col-md-1">Market Cap</div>
-            <div className="crypto-coin-header col-md-1">Price</div>
-            <div className="crypto-coin-header col-md-1">Volume (24h)</div>
-            <div className="crypto-coin-header col-md-1">Circulating Supply</div>
-            <div className="crypto-coin-header col-md-1">Price Change (24h)</div>
-            <div className="crypto-coin-header col-md-1">Price Change (7 days)</div>
+    // Shown upon intial page load.
+    if (!this.state.intialCompDidMount) {
+      return (
+          <div className="App">
+            <h1 className="crypto-currency-title">Crypto Currencies Market Capitalization</h1>
+            <div className="crypto-coin-header-row">
+              <div className="crypto-coin-header col-md-1">Name</div>
+              <div className="crypto-coin-header col-md-1">Market Cap</div>
+              <div className="crypto-coin-header col-md-1">Price</div>
+              <div className="crypto-coin-header col-md-1">Volume (24h)</div>
+              <div className="crypto-coin-header col-md-1">Circulating Supply</div>
+              <div className="crypto-coin-header col-md-1">Price Change (24h)</div>
+              <div className="crypto-coin-header col-md-1">Price Change (7 days)</div>
+            </div>
+            <span><hr className="headerLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.bitCoinName}
+                CryptoCoinMarketCapProp = {this.state.bitCoinMarketCap}
+                CryptoCoinPriceProp = {this.state.bitCoinPrice}
+                CryptoCoinVolumeProp = {this.state.bitCoinVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.bitCoinCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.bitCoinChange }
+                CryptoCoinImgGraphProp = {this.state.bitCoinImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.ethereumName}
+                CryptoCoinMarketCapProp = {this.state.ethereumMarketCap}
+                CryptoCoinPriceProp = {this.state.ethereumPrice}
+                CryptoCoinVolumeProp = {this.state.ethereumVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.ethereumCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.ethereumChange }
+                CryptoCoinImgGraphProp = {this.state.ethereumImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.xrpName}
+                CryptoCoinMarketCapProp = {this.state.xrpMarketCap}
+                CryptoCoinPriceProp = {this.state.xrpPrice}
+                CryptoCoinVolumeProp = {this.state.xrpVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.xrpCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.xrpChange }
+                CryptoCoinImgGraphProp = {this.state.xrpImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.eosName}
+                CryptoCoinMarketCapProp = {this.state.eosMarketCap}
+                CryptoCoinPriceProp = {this.state.eosPrice}
+                CryptoCoinVolumeProp = {this.state.eosVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.eosCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.eosChange }
+                CryptoCoinImgGraphProp = {this.state.eosImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.stellarName}
+                CryptoCoinMarketCapProp = {this.state.stellarMarketCap}
+                CryptoCoinPriceProp = {this.state.stellarPrice}
+                CryptoCoinVolumeProp = {this.state.stellarVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.stellarCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.stellarChange }
+                CryptoCoinImgGraphProp = {this.state.stellarImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.liteCoinName}
+                CryptoCoinMarketCapProp = {this.state.liteCoinMarketCap}
+                CryptoCoinPriceProp = {this.state.liteCoinPrice}
+                CryptoCoinVolumeProp = {this.state.liteCoinVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.liteCoinCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.liteCoinChange }
+                CryptoCoinImgGraphProp = {this.state.liteCoinImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.bitCoinSVName}
+                CryptoCoinMarketCapProp = {this.state.bitCoinSVMarketCap}
+                CryptoCoinPriceProp = {this.state.bitCoinSVPrice}
+                CryptoCoinVolumeProp = {this.state.bitCoinSVVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.bitCoinSVCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.bitCoinSVChange }
+                CryptoCoinImgGraphProp = {this.state.bitCoinSVImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.tetherName}
+                CryptoCoinMarketCapProp = {this.state.tetherMarketCap}
+                CryptoCoinPriceProp = {this.state.tetherPrice}
+                CryptoCoinVolumeProp = {this.state.tetherVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.tetherCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.tetherChange }
+                CryptoCoinImgGraphProp = {this.state.tetherImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.cardanoName}
+                CryptoCoinMarketCapProp = {this.state.cardanoMarketCap}
+                CryptoCoinPriceProp = {this.state.cardanoPrice}
+                CryptoCoinVolumeProp = {this.state.cardanoVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.cardanoCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.cardanoChange }
+                CryptoCoinImgGraphProp = {this.state.cardanoImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
+            <CryptoCoin
+                CryptoCoinNameProp = {this.state.tronName}
+                CryptoCoinMarketCapProp = {this.state.tronMarketCap}
+                CryptoCoinPriceProp = {this.state.tronPrice}
+                CryptoCoinVolumeProp = {this.state.tronVolume}
+                CryptoCoinCirculatingSupplyProp = {this.state.tronCirculatingSupply}
+                CryptoCoinChangeProp = {this.state.tronChange }
+                CryptoCoinImgGraphProp = {this.state.tronImgGraph}
+            />
+            <span><hr className="rowLine"></hr></span>
           </div>
-          <span><hr className="headerLine"></hr></span>
-          <CryptoCoin
-              CryptoCoinNameProp = {this.state.bitCoinName}
-              CryptoCoinMarketCapProp = {this.state.bitCoinMarketCap}
-              CryptoCoinPriceProp = {this.state.bitCoinPrice}
-              CryptoCoinVolumeProp = {this.state.bitCoinVolume}
-              CryptoCoinCirculatingSupplyProp = {this.state.bitCoinCirculatingSupply}
-              CryptoCoinChangeProp = {this.state.bitCoinChange + '%'}
-              CryptoCoinImgGraphProp = {this.state.bitCoinImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.ethereumName}
-            CryptoCoinMarketCapProp = {this.state.ethereumMarketCap}
-            CryptoCoinPriceProp = {this.state.ethereumPrice}
-            CryptoCoinVolumeProp = {this.state.ethereumVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.ethereumCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.ethereumChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.ethereumImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-              CryptoCoinNameProp = {this.state.xrpName}
-              CryptoCoinMarketCapProp = {this.state.xrpMarketCap}
-              CryptoCoinPriceProp = {this.state.xrpPrice}
-              CryptoCoinVolumeProp = {this.state.xrpVolume}
-              CryptoCoinCirculatingSupplyProp = {this.state.xrpCirculatingSupply}
-              CryptoCoinChangeProp = {this.state.xrpChange + '%'}
-              CryptoCoinImgGraphProp = {this.state.xrpImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.eosName}
-            CryptoCoinMarketCapProp = {this.state.eosMarketCap}
-            CryptoCoinPriceProp = {this.state.eosPrice}
-            CryptoCoinVolumeProp = {this.state.eosVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.eosCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.eosChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.eosImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.stellarName}
-            CryptoCoinMarketCapProp = {this.state.stellarMarketCap}
-            CryptoCoinPriceProp = {this.state.stellarPrice}
-            CryptoCoinVolumeProp = {this.state.stellarVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.stellarCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.stellarChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.stellarImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.liteCoinName}
-            CryptoCoinMarketCapProp = {this.state.liteCoinMarketCap}
-            CryptoCoinPriceProp = {this.state.liteCoinPrice}
-            CryptoCoinVolumeProp = {this.state.liteCoinVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.liteCoinCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.liteCoinChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.liteCoinImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.bitCoinSVName}
-            CryptoCoinMarketCapProp = {this.state.bitCoinSVMarketCap}
-            CryptoCoinPriceProp = {this.state.bitCoinSVPrice}
-            CryptoCoinVolumeProp = {this.state.bitCoinSVVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.bitCoinSVCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.bitCoinSVChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.bitCoinSVImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.tetherName}
-            CryptoCoinMarketCapProp = {this.state.tetherMarketCap}
-            CryptoCoinPriceProp = {this.state.tetherPrice}
-            CryptoCoinVolumeProp = {this.state.tetherVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.tetherCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.tetherChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.tetherImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.cardanoName}
-            CryptoCoinMarketCapProp = {this.state.cardanoMarketCap}
-            CryptoCoinPriceProp = {this.state.cardanoPrice}
-            CryptoCoinVolumeProp = {this.state.cardanoVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.cardanoCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.cardanoChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.cardanoImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-          <CryptoCoin
-            CryptoCoinNameProp = {this.state.tronName}
-            CryptoCoinMarketCapProp = {this.state.tronMarketCap}
-            CryptoCoinPriceProp = {this.state.tronPrice}
-            CryptoCoinVolumeProp = {this.state.tronVolume}
-            CryptoCoinCirculatingSupplyProp = {this.state.tronCirculatingSupply}
-            CryptoCoinChangeProp = {this.state.tronChange + '%'}
-            CryptoCoinImgGraphProp = {this.state.tronImgGraph}
-          />
-          <span><hr className="rowLine"></hr></span>
-      </div>
-    );
+      );
+    } else {
+      //shown after first data fetch
+      return (
+          <div className="App">
+            <h1 className="crypto-currency-title">Crypto Currencies Market Capitalization</h1>
+            <div className="crypto-coin-header-row">
+              <div className="crypto-coin-header col-md-1">Name</div>
+              <div className="crypto-coin-header col-md-1">Market Cap</div>
+              <div className="crypto-coin-header col-md-1">Price</div>
+              <div className="crypto-coin-header col-md-1">Volume (24h)</div>
+              <div className="crypto-coin-header col-md-1">Circulating Supply</div>
+              <div className="crypto-coin-header col-md-1">Price Change (24h)</div>
+              <div className="crypto-coin-header col-md-1">Price Change (7 days)</div>
+            </div>
+            <span><hr className="headerLine"></hr></span>
+            {this.state.cryptoCoins.map((key,i) =>
+                <div>
+                  <CryptoCoin
+                      CryptoCoinNameProp = {this.state.cryptoCoins[i].coinName}
+                      CryptoCoinMarketCapProp = {this.state.cryptoCoins[i].marketCap}
+                      CryptoCoinPriceProp = {this.state.cryptoCoins[i].price}
+                      CryptoCoinVolumeProp = {this.state.cryptoCoins[i].volume}
+                      CryptoCoinCirculatingSupplyProp = {this.state.cryptoCoins[i].circulatingSupply}
+                      CryptoCoinChangeProp = {this.state.cryptoCoins[i].change}
+                      CryptoCoinImgGraphProp = {this.state.cryptoCoins[i].priceGraph}
+                  />
+                  <span><hr className="rowLine"></hr></span>
+                </div>
+            )}
+          </div>
+      );
+    }
   }
 }
 

@@ -4,14 +4,13 @@ export function getCryptoData() {
     return fetch('http://localhost:3001/')
         .then((resp) => {
             console.log(resp.toString());
-            alert(resp.text());
             return resp.text() })
         .then((data) => {
         })
         .catch((error) => {
             console.error(error);
         });
-} // end getCryptoData
+}
 
 export function extractContent(element) {
     element = element.toString().replace(/(\r\n|\n|\r)/gm, " ");
@@ -20,25 +19,55 @@ export function extractContent(element) {
     span.innerHTML = element;
 
     return span.textContent || span.innerText;
-} // end extractContent
+}
+
+export function getCryptoCoinRows(cryptoCoin) {
+    let cryptoCoins = new Array();
+    cryptoCoins = cryptoCoin.toString().split("<tr class=\"cmc-table-row\"")
+
+    return cryptoCoins;
+}
+
+export function getDollarAmount(cryptoCoin, searchField) {
+    const fieldIndex = cryptoCoin.toString().indexOf(searchField);
+    const startIndex = cryptoCoin.toString().indexOf('$',fieldIndex);
+    const endIndex = cryptoCoin.toString().indexOf('<', startIndex);
+    const subString = cryptoCoin.toString().substring(startIndex, endIndex);
+
+    return subString;
+}
+
+export function getCryptoCoinCirculatingSupply(cryptoCoin) {
+    const parser = new DOMParser.DOMParser();
+    const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
+    const circulatingSupplyElm = parsedElement.toString().split('circulating-supply');
+
+    if (circulatingSupplyElm[1] !== undefined) {
+        const start = circulatingSupplyElm[1].toString().search(/\d/);
+        const end = circulatingSupplyElm[1].toString().indexOf('<', start);
+        const circulatingSupply = circulatingSupplyElm[1].toString().substring(start,end);
+
+        return circulatingSupply;
+    } else {
+        return '';
+    }
+}
 
 export function getCryptoCoinName(cryptoCoin){
     const parser = new DOMParser.DOMParser();
     const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const nameElement = parsedElement.getElementsByAttribute('class', 'currency-name-container link-secondary');
-    const nameValue = parser.parseFromString(nameElement.toString(), 'text/html');
+    const nameElm = parsedElement.toString().split('title');
 
-    return nameValue;
-} // end getCryptoCoinName
+    if (nameElm[1] !== undefined) {
+        const start = nameElm[1].toString().indexOf("\"") + 1;
+        const end = nameElm[1].toString().indexOf("\"",start + 1);
+        const coinName = nameElm[1].toString().substring(start,end);
 
-export function getCryptoCoinMarketCap(cryptoCoin){
-    const parser = new DOMParser.DOMParser();
-    const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const marketCapElement = parsedElement.getElementsByAttribute('class', 'no-wrap market-cap text-right');
-    const marketCapValue = parser.parseFromString(marketCapElement.toString(), 'text/html');
-
-    return marketCapValue;
-} // end getCryptoCoinMarketCap
+        return coinName;
+    } else {
+        return '';
+    }
+}
 
 export function getCryptoCoinPrice(cryptoCoin) {
     const parser = new DOMParser.DOMParser();
@@ -47,7 +76,7 @@ export function getCryptoCoinPrice(cryptoCoin) {
     const priceValue = parser.parseFromString(priceElement.toString(), 'text/html');
 
     return priceValue;
-} // end getCryptoCoinPrice
+}
 
 export function getCryptoCoinVolume(cryptoCoin) {
     const parser = new DOMParser.DOMParser();
@@ -56,47 +85,36 @@ export function getCryptoCoinVolume(cryptoCoin) {
     const volumeValue = parser.parseFromString(volumeElement.toString(), 'text/html');
 
     return volumeValue;
-} // end getCryptoCoinVolume
-
-export function getCryptoCoinCirculatingSupply(cryptoCoin) {
-    const parser = new DOMParser.DOMParser();
-    const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const circulatingSupplyElement = parsedElement.getElementsByAttribute('class','no-wrap text-right circulating-supply');
-    const circulatingSupplyValue = parser.parseFromString(circulatingSupplyElement.toString(), 'text/html');
-
-    return circulatingSupplyValue;
-} // end getCryptoCoinCirculatingSupply
+}
 
 export function getCryptoCoinChange(cryptoCoin) {
     const parser = new DOMParser.DOMParser();
     const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    const percentIndex = parsedElement.toString().indexOf('%');
+    const changeElm = parsedElement.toString().split('change-');
 
-    // Get the trailing characters up to >
-    const changeElement = parsedElement.toString().substring((percentIndex - 6), percentIndex);
-    const coinChangeValue = changeElement.replace(/("|>)/g, "");
+    if (changeElm[2] !== undefined) {
+        const start = changeElm[2].toString().indexOf(">") + 1
+        const end = changeElm[2].toString().indexOf("<",start)
+        const coinChange = changeElm[2].toString().substring(start,end);
 
-    return coinChangeValue;
-} // end getCryptoCoinChange
+        return coinChange;
+    } else {
+        return '';
+    }
+}
 
 export function getCryptoCoinPriceGraphImg(cryptoCoin) {
     const parser = new DOMParser.DOMParser();
     const parsedElement = parser.parseFromString(cryptoCoin.toString(), 'text/html');
-    let imgElement = parsedElement.getElementsByAttribute('class', 'sparkline');
-    let imgElementStr = imgElement.toString();
+    const imgElm = parsedElement.toString().split('img src=');
 
-    // lazyload class may be added to an elements attribute in the event of a lazyload
-    if (imgElementStr === "") {
-        imgElement = parsedElement.getElementsByAttribute('class', 'sparkline lazyload');
-        imgElementStr = imgElement.toString();
+    if (imgElm[2] !== undefined) {
+        const start = imgElm[2].toString().indexOf("\"") + 1;
+        const end = imgElm[2].toString().indexOf("\"",start);
+        const coinImgGraph = imgElm[2].toString().substring(start,end);
+
+        return coinImgGraph;
+    } else {
+        return '';
     }
-
-    // Get starting end ending indexs
-    const URIStartIndex = imgElementStr.indexOf(':');
-    const URIEndIndex = imgElementStr.indexOf('png');
-
-    // Get img path
-    const imgValue = imgElementStr.substring((URIStartIndex-5), (URIEndIndex+3));
-
-    return imgValue;
-} // end getCryptoCoinPriceGraphImg
+}
