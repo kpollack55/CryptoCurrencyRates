@@ -1,16 +1,5 @@
 import DOMParser from "react-native-html-parser";
 
-export function getCryptoData() {
-    return fetch('http://localhost:3001/')
-        .then((resp) => {
-            console.log(resp.toString());
-            return resp.text() })
-        .then((data) => {
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-}
 
 export function extractContent(element) {
     element = element.toString().replace(/(\r\n|\n|\r)/gm, " ");

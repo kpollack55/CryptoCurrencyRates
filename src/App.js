@@ -28,8 +28,9 @@ class App extends Component {
 
     this.state = {
       seconds: 0,
-      intialCompDidMount: false,
+      initialCompDidMount: false,
       cryptoCoins: [],
+      clearCryptoCoins: false,
 
       // Initialize state so user does not see blank data upon load.
       bitCoinName: 'Bitcoin',
@@ -138,6 +139,9 @@ class App extends Component {
     this.setState(prevState => ({
       seconds: prevState.seconds + 1
     }));
+
+    // Update trigger to remove old crypto coin data
+    this.setState({clearCryptoCoins:true});
   }
 
   setCryptoCoins(cryptoCoins) {
@@ -157,17 +161,26 @@ class App extends Component {
   }
 
   componentDidMount() {
-    if ( this.state.intialCompDidMount ===  false) {
-      this.state.intialCompDidMount = true;
+    if ( this.state.initialCompDidMount === false) {
+      this.setState({initialCompDidMount: true});
       // Set interval at 10 for first iteration so place holder data is replaced right away from page load
-      this.interval = setInterval(() => this.getCryptoData(), 10);
+      this.setState({interval: setInterval(() => this.getCryptoData(), 10)});
     } else {
-      this.interval = setInterval(() => this.getCryptoData(), 10000);
+        this.setState({interval: setInterval(() => this.getCryptoData(), 10000)});
     }
   }
 
   componentDidUpdate() {
-    this.state.cryptoCoins = [];
+     this.clearCryptoCoins();
+  }
+
+  clearCryptoCoins() {
+      if(this.state.clearCryptoCoins === true) {
+          while(this.state.cryptoCoins.length > 10) {
+              this.state.cryptoCoins.shift();
+          }
+          this.setState({clearCryptoCoins:false});
+      }
   }
 
   componentWillUnmount() {
@@ -175,8 +188,8 @@ class App extends Component {
   }
 
   render() {
-    // Shown upon intial page load.
-    if (!this.state.intialCompDidMount) {
+    // Shown upon initial page load.
+    if (!this.state.initialCompDidMount) {
       return (
           <div className="App">
             <h1 className="crypto-currency-title">Crypto Currencies Market Capitalization</h1>
